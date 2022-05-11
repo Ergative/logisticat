@@ -1,0 +1,11 @@
+Package: logisticat
+Title: Plot Logistic Regressions and Find X at a Given Y
+Version: 0.0.0.9000
+Authors@R: 
+    person("Peter", "Nilsson", , "peter.nilsson@student.csulb.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-8572-5518"))
+Description: Visualize a logistic regression and find the point on the X axis where Y is a given value, such as the time it takes 50% of animals to reach a specific stage of development.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2

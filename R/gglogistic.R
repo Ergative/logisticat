@@ -168,7 +168,7 @@ gglogistic <- function(
             color = {{treatment}},
             fill = {{treatment}},
             group = interaction({{predictor}}, {{treatment}})),
-          width = dodge.width, # TODO test if this is reasonable.
+          #width = boxplot.width, # TODO width of actual BOX, not dodge.
           position = ggplot2::position_dodge(preserve = "single")
         )
     }

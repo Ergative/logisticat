@@ -11,7 +11,7 @@ A \code{data.frame} with example data.
 }
 \description{
 When exposed to potassium chloride, and echinoid larvae will either
-metamorhpose, in which case it has reached metamorphic competence, or it will
+metamorphose, in which case it has reached metamorphic competence, or it will
 fail to metamorphose, in which case it is not competent.
 }
 \details{

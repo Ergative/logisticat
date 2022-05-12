@@ -2,7 +2,7 @@
 #'
 #' @param data `data.frame` with the columns named in the other arguments.
 #' @param predictor Continuous predictor variable.
-#' @param outcome `logical` outcome variable with values TRUE or FALSE.
+#' @param outcome Outcome variable with values 1 for success and 0 for failure.
 #'
 #' @return A logistic regression model in a `glm` class object.
 #' @export

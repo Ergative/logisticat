@@ -11,8 +11,13 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
     dplyr,
+    ggplot2,
+    ggrepel,
+    glue,
+    grDevices,
     magrittr,
     rlang (>= 0.4.11),
+    scales,
     stats,
     tibble,
     tidyr

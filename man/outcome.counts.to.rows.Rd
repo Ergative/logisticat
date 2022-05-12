@@ -17,17 +17,20 @@ outcome.counts.to.rows(data, success.counts, failure.counts, outcome)
 }
 \value{
 A \code{data.frame} with counts represented as repeated rows with a
-\code{logical} flag representing a pass or fail.
+number 1 representing a success or a 0 represnting a failure.
 }
 \description{
 Given a \code{data.frame} containing results of a test with two possible outcomes
 that is arranged with the number of "successes" per group in one column
 and the number of "failures" per group in another column, return a new
-\code{data.frame} that has a single outcome column with TRUE and FALSE values,
-with each outcome mapped to a single row.
+\code{data.frame} that has a single outcome column with \code{1} for every success
+and \code{0} for every failure, mapping each outcome to a single row.
 }
 \details{
 The output is the format \code{glm()} expects when constructing logistic
 regressions. The "successes" and "failures" can be any two mutually
-exclusive states.
+exclusive states. Note that, while one would expect these to be logical
+(TRUE and FALSE) values, \code{glm()} requires numeric values. You can think
+about these numbers as representing the probability of success, which is
+1 for success that actually happened and 0 for successes that did not.
 }

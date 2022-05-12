@@ -11,7 +11,7 @@ logistic.regression(data, predictor, outcome)
 
 \item{predictor}{Continuous predictor variable.}
 
-\item{outcome}{\code{logical} outcome variable with values TRUE or FALSE.}
+\item{outcome}{Outcome variable with values 1 for success and 0 for failure.}
 }
 \value{
 A logistic regression model in a \code{glm} class object.

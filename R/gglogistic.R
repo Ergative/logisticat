@@ -63,6 +63,22 @@ gglogistic <- function(
   jitter.width            = 0,
   dodge.width             = 0) {
 
+  # Allow columns to be specified as variable names or as strings.
+  predictor <- as.name(substitute(predictor))
+  predictor <- rlang::enquo(predictor)
+  success.counts <- as.name(substitute(success.counts))
+  success.counts <- rlang::enquo(success.counts)
+  failure.counts <- as.name(substitute(failure.counts))
+  failure.counts <- rlang::enquo(failure.counts)
+  treatment <- as.name(substitute(treatment))
+  treatment <- rlang::enquo(treatment)
+  replicate <- as.name(substitute(replicate))
+  replicate <- rlang::enquo(replicate)
+
+  # This prevents R check notes for undefined globals, but you don't actually
+  # need to define this variable first.
+  outcome = rlang::sym("outcome")
+
   row.data <- data %>% outcome.counts.to.rows({{success.counts}},
                                               {{failure.counts}},
                                               outcome)

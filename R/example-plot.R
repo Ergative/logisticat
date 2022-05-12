@@ -4,11 +4,11 @@
 example.plot <- function (){
   logisticat::metamorphosis() %>%
     logisticat::gglogistic(
-      predictor = days,
-      success.counts = metamorphosed,
-      failure.counts = did.not.metamorphose,
-      treatment = ration,
-      replicate = beaker,
+      predictor = "days",
+      success.counts = "metamorphosed",
+      failure.counts = "did.not.metamorphose",
+      treatment = "ration",
+      replicate = "beaker",
       probability.of.interest = 0.5,
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",

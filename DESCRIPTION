@@ -12,9 +12,11 @@ RoxygenNote: 7.1.2
 Imports: 
     dplyr,
     magrittr,
-    rlang,
+    rlang (>= 0.4.11),
+    stats,
     tibble,
     tidyr
 Suggests: 
+    roxygen2,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

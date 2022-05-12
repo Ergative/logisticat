@@ -10,6 +10,7 @@ testthat::test_that("counts.to.reps works on small data set", {
     "p1f1",  F,
   )
 
-  actual.output <- counts.to.reps(sanity.check, pass, fail, result)
+  actual.output <- logisticat::outcome.counts.to.rows(
+    logisticat::sanity.check(), pass, fail, result)
   testthat::expect_equal(actual.output, expected.output, ignore_attr = T)
 })

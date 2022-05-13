@@ -4,9 +4,9 @@
 #' @param alpha Value in range \[0,1\] for alpha.
 #'
 #' @return A hex string representing the color with the chosen alpha.
-with.alpha = Vectorize(function(color, alpha=1) {
-  a = clamp(floor(alpha * 255), 0, 255)
-  rgb = grDevices::col2rgb(color, F)
+with.alpha <- Vectorize(function(color, alpha=1) {
+  a <- clamp(floor(alpha * 255), 0, 255)
+  rgb <- grDevices::col2rgb(color, F)
   paste0("#", byte2hex(rgb[1]), byte2hex(rgb[2]), byte2hex(rgb[3]), byte2hex(a))
 }, vectorize.args = "color")
 
@@ -18,7 +18,7 @@ with.alpha = Vectorize(function(color, alpha=1) {
 #' @param max.value Maximum, inclusive.
 #'
 #' @return The closest number in the range \[min.value,max.value\] to value.
-clamp = function(value, min.value, max.value) {
+clamp <- function(value, min.value, max.value) {
   max(min.value, min(max.value, value))
 }
 
@@ -28,7 +28,7 @@ clamp = function(value, min.value, max.value) {
 #' @param byte Integer value in range \[0,255\]
 #'
 #' @return String representation of byte.
-byte2hex = function(byte) {
+byte2hex <- function(byte) {
   paste0(nybble2hex(bitwShiftR(byte, 4)), nybble2hex(bitwAnd(byte, 15)))
 }
 
@@ -38,7 +38,7 @@ byte2hex = function(byte) {
 #' @param nybble Integer value in range \[0,15\]
 #'
 #' @return String representation of nybble.
-nybble2hex = function(nybble) {
+nybble2hex <- function(nybble) {
   nybble.names = c("0", "1", "2", "3", "4", "5", "6", "7",
                    "8", "9", "a", "b", "c", "d", "e", "f")
   nybble.names[[nybble + 1]] # 1-indexed.

@@ -30,8 +30,9 @@ test_that("gglotistic can take character arguments as variables", {
                                 xlabel = "Age (days)",
                                 ylabel = "Metamorphic Competence",
                                 treatment.label = "Algal Ration",
-                                treatment.colors = c("high" = "#f2af09","low" = "#ea1578"),
-                                geoms = c("line", "boxplot")), c("gg", "ggplot"))
+                                treatment.colors = c("high" = "#f2af09",
+                                                     "low" = "#ea1578")),
+                            c("gg", "ggplot"))
 })
 
 test_that("gglotistic can take symbols as variables", {
@@ -46,8 +47,9 @@ test_that("gglotistic can take symbols as variables", {
                                 xlabel = "Age (days)",
                                 ylabel = "Metamorphic Competence",
                                 treatment.label = "Algal Ration",
-                                treatment.colors = c("high" = "#f2af09","low" = "#ea1578"),
-                                geoms = c("line", "boxplot")), c("gg", "ggplot"))
+                                treatment.colors = c("high" = "#f2af09",
+                                                     "low" = "#ea1578")),
+                            c("gg", "ggplot"))
 })
 
 test_that("gglotistic makes desired geoms", {
@@ -58,13 +60,16 @@ test_that("gglotistic makes desired geoms", {
       success.counts = metamorphosed,
       failure.counts = did.not.metamorphose,
       treatment = ration,
-      replicate = beaker,
+      replicate = "beaker",
       probability.of.interest = 0.5,
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
       treatment.colors = c("high" = "#f2af09","low" = "#ea1578"),
-      geoms = c("line", "boxplot"))
+      line.var = "ration",
+      boxplot.var = "ration",
+      point.var = "ration",
+      inverse.var = "ration")
 
   testthat::expect_equal(
     are.all.required.geoms.present(p, c("GeomLine",

@@ -11,14 +11,18 @@ gglogistic(
   failure.counts,
   treatment,
   replicate,
+  line.var = "both",
+  point.var = NULL,
+  boxplot.var = NULL,
+  inverse.var = NULL,
   probability.of.interest = 0.5,
   xlabel = NULL,
   ylabel = NULL,
   treatment.label = NULL,
   treatment.colors = NULL,
   integer.x.breaks.by = NULL,
-  geoms = "line",
   fill.alpha = 0.25,
+  replicate.alpha = 0.5,
   jitter.width = 0,
   dodge.width = 0
 )
@@ -34,10 +38,33 @@ gglogistic(
 
 \item{treatment}{Treatment variable.}
 
-\item{replicate}{Within-treatment replicates. NOT IMPLEMENTED YET.}
+\item{replicate}{Within-treatment replicates.}
+
+\item{line.var}{Variable to plot regression curves for. Must be the same as
+\code{treatment} or \code{replicate}, or the character vector "both"
+to plot both. Pass NULL to hide. Defaults to same variable
+as \code{treatment}. y-axis represents predicted probability ad
+each value of predictor.}
+
+\item{point.var}{Variable to represent with points. Must be the same as
+\code{treatment} or \code{replicate}, or the character vector "both"
+to plot both. Pass NULL to hide. Defaults to NULL. y-axis
+value represents fraction of successes in each observation
+(for \code{replicate}) or across all observations with the
+same treatment and same predictor (for \code{treatment}).}
+
+\item{boxplot.var}{Variable to represent with points. Must be the same as
+\code{treatment} or \code{replicate}, or the character vector "both"
+to plot both. Pass NULL to hide. Defaults to NULL. y-axis
+has same meaning as for \code{point.var}.}
+
+\item{inverse.var}{Variable to draw lines representing inverse predictions
+for. Must be the same as \code{treatment} or \code{replicate}, or
+the character vector "both" to plot both. Pass NULL to
+hide. Defaults to same variable as \code{line.var}.}
 
 \item{probability.of.interest}{Calculate predictor value in each group that
-would yield this probability, or pass NULL to ignore.}
+would yield this probability.}
 
 \item{xlabel}{Label for x-axis.}
 
@@ -50,15 +77,14 @@ would yield this probability, or pass NULL to ignore.}
 \item{integer.x.breaks.by}{If specified, integer breaks in x-axis. Forces
 ggplot to break at integer values.}
 
-\item{geoms}{Vector containing any or all of c("line", "point", "boxplot").
-"boxplot" only makes sense for data where the predictor is
-conceptually continuous, but was only sampled at discrete steps.
-For instance, if the predictor is time, and samples were only
-taken once per day, a boxplot might be useful.}
-
 \item{fill.alpha}{Opacity in range [0,1] for fill of boxplots. Boxplots can
 be hard to see if there is a lot of data, and having a
 light fill color helps to distinguish them.}
+
+\item{replicate.alpha}{Opacity in range [0,1] to draw \code{replicate}
+geoms at when the same geom is also drawn for
+\code{treatment}. Helps distinguish \code{treatment} from
+\code{replicate} values.}
 
 \item{jitter.width}{If specified, amount to jitter points in x-axis. Useful
 if predictor was sampled at discrete steps that would
@@ -72,19 +98,4 @@ A ggplot object.
 }
 \description{
 Plot logistic regression of probability from 0\% to 100\% across a predictor.
-}
-\examples{
-logisticat::metamorphosis() \%>\%
-  logisticat::gglogistic(
-    predictor = days,
-    success.counts = metamorphosed,
-    failure.counts = did.not.metamorphose,
-    treatment = ration,
-    replicate = beaker,
-    probability.of.interest = 0.5,
-    xlabel = "Age (days)",
-    ylabel = "Metamorphic Competence",
-    treatment.label = "Algal Ration",
-    treatment.colors = c("high" = "#f2af09","low" = "#ea1578"),
-    geoms = c("line", "boxplot"))
 }

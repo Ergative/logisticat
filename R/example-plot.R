@@ -13,8 +13,8 @@ example.plot <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      treatment.colors = c("high" = "#f2af09","low" = "#ea1578"),
-      geoms = c("line", "boxplot"))
+      boxplot.var = "beaker",
+      replicate.alpha = 1)
 }
 
 

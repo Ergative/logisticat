@@ -115,9 +115,13 @@ gglogistic <- function(
     stop(glue::glue("One or more of predictor, success.counts, failure.counts, or treatment were NULL"))
   }
 
+  #data <- data %>% dplyr::mutate(treatment = as.factor(treatment))
+
   if (!missing(replicate)) { # This one can be null, the rest SHOULD throw error
     replicate <- as.name(substitute(replicate))
     replicate <- rlang::ensym(replicate)
+
+    #data <- data %>% dplyr::mutate(replicate = as.factor(replicate))
   }
 
   # For each geom we can draw, figure out which of the following was specified:
@@ -338,6 +342,30 @@ gglogistic <- function(
   need.regressions <- plot.line  || plot.inverse
   need.fractions   <- plot.point || plot.boxplot
 
+# ALL these are right
+  if (F){
+    print(glue::glue("line.treatment: {line.treatment}"))
+    print(glue::glue("point.treatment: {point.treatment}"))
+    print(glue::glue("boxplot.treatment: {boxplot.treatment}"))
+    print(glue::glue("inverse.treatment: {inverse.treatment}"))
+
+    print(glue::glue("line.replicate: {line.replicate}"))
+    print(glue::glue("point.replicate: {point.replicate}"))
+    print(glue::glue("boxplot.replicate: {boxplot.replicate}"))
+    print(glue::glue("inverse.replicate: {inverse.replicate}"))
+  }
+
+  if (F) {
+    print(glue::glue("plot.line: {plot.line}"))
+    print(glue::glue("plot.point: {plot.point}"))
+    print(glue::glue("plot.boxplot: {plot.boxplot}"))
+    print(glue::glue("plot.inverse: {plot.inverse}"))
+
+    print(glue::glue("need.regressions: {need.regressions}"))
+    print(glue::glue("need.fractions: {need.fractions}"))
+  }
+
+
 
   # ============================================================================
   # PREPARING DATA FRAMES FOR INTERNAL USE
@@ -354,6 +382,9 @@ gglogistic <- function(
     individual.rows <- data %>% outcome.counts.to.rows({{success.counts}},
                                                        {{failure.counts}},
                                                        outcome)
+
+    str(individual.rows)
+    View(individual.rows)
 
     # TODO could have two different group_by versions up here, so grouping
     # logic below can be simplified.
@@ -379,13 +410,22 @@ gglogistic <- function(
         dplyr::summarise({{success.counts}} := sum({{success.counts}}),
                          {{failure.counts}} := sum({{failure.counts}})) %>%
         success.fractions()
+
+      View(treatment.fractions)
     }
 
     if (plot.replicate) {
       # Fractions calculated with replicates still separate.
       replicate.fractions <-
         data %>%
+        dplyr::group_by({{predictor}}, {{treatment}}, {{replicate}}) %>%
+        dplyr::summarise({{success.counts}} := sum({{success.counts}}),
+                         {{failure.counts}} := sum({{failure.counts}})) %>%
         success.fractions()
+
+
+
+      View(replicate.fractions)
     }
   }
 
@@ -413,7 +453,7 @@ gglogistic <- function(
         # and for replicate.
         data = individual.rows,
         stat = "smooth",
-        mapping = ggplot2::aes(group = {{group.var}}),
+        mapping = ggplot2::aes(group = {{group.var}}, color = {{treatment}}),
         formula = y ~ x,
         method = "glm",
         method.args = list(family = "binomial"),
@@ -439,7 +479,7 @@ gglogistic <- function(
         effictive.replicate.alpha <- 1
       }
 
-      p <- p + make.line({{replicate}}, effictive.replicate.alpha)
+      p <- p + make.line(interaction({{treatment}}, {{replicate}}), effictive.replicate.alpha)
     }
   }
 
@@ -609,6 +649,8 @@ gglogistic <- function(
   # AESTHETICS
   # ============================================================================
 
+  print(glue::glue("treatment.colors: {treatment.colors}")) # doesn't print anything if null!!
+  print("here")
   if (!is.null(treatment.colors)){
     # Extract the vector of level values from the factor in the treatment
     # column so that we can pass this same vector as the `breaks` argument
@@ -688,5 +730,6 @@ gglogistic <- function(
       text             = ggplot2::element_text(size = 12)
     )
 
+  View(p)
   p
 }

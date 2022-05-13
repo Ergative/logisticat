@@ -383,9 +383,6 @@ gglogistic <- function(
                                                        {{failure.counts}},
                                                        outcome)
 
-    str(individual.rows)
-    View(individual.rows)
-
     # TODO could have two different group_by versions up here, so grouping
     # logic below can be simplified.
   }
@@ -410,8 +407,6 @@ gglogistic <- function(
         dplyr::summarise({{success.counts}} := sum({{success.counts}}),
                          {{failure.counts}} := sum({{failure.counts}})) %>%
         success.fractions()
-
-      View(treatment.fractions)
     }
 
     if (plot.replicate) {
@@ -422,10 +417,6 @@ gglogistic <- function(
         dplyr::summarise({{success.counts}} := sum({{success.counts}}),
                          {{failure.counts}} := sum({{failure.counts}})) %>%
         success.fractions()
-
-
-
-      View(replicate.fractions)
     }
   }
 
@@ -472,14 +463,14 @@ gglogistic <- function(
       if (line.treatment){
         # Make replicate lines a bit transparent so they are easy to distinguish
         # from and don't hide the treatment lines.
-        effictive.replicate.alpha <- replicate.alpha
+        effective.replicate.alpha <- replicate.alpha
       } else {
         # No point making them transparent if there's nothing else.
         # TODO: Or maybe caller has other geoms for treatment?
-        effictive.replicate.alpha <- 1
+        effective.replicate.alpha <- 1
       }
 
-      p <- p + make.line(interaction({{treatment}}, {{replicate}}), effictive.replicate.alpha)
+      p <- p + make.line(interaction({{treatment}}, {{replicate}}), effective.replicate.alpha)
     }
   }
 
@@ -561,12 +552,10 @@ gglogistic <- function(
 
 
     make.inverse <- function(d, group.var, alpha) {
-      # TODO group_by/interaction for replicate?
       group.names <-
         d %>%
-        ## TODO: see tc50.by.beaker
         dplyr::select({{group.var}}) %>%
-        unique() %>% # TODO: does order wrt/pull() matter?
+        unique() %>%
         dplyr::pull(1) # Get first (only) column as vector.
 
       get.rows.matching.group.name <- function(group.name) {
@@ -592,14 +581,12 @@ gglogistic <- function(
                                              probability.of.interest)}) %>%
         unlist() # ggplot hates lists in data frames.
 
-      # Populate a new data frame with inverse predictions and <here is whre we would map back in treatment to get right color>
+      # Populate a new data frame with inverse predictions
       inverse.prediction.df <-
         tibble::tibble(
           {{predictor}} := group.inverse.predictions,
           {{treatment}} := group.names
-          # TODO: replicate?
         )
-      ###################### END "tc50.by.beaker"
 
       # Return these two geoms as a list because you can't `+` ggproto objects
       # together unless you have already `+`ed them to a ggplot.
@@ -611,7 +598,7 @@ gglogistic <- function(
         data = inverse.prediction.df,
         y = 0,
         yend = probability.of.interest,
-        alpha = 1),
+        alpha = alpha),
 
       # Label for the line. geom_label_repel is good at getting labels out
       # of the way, though it doesn't necessarily mean they don't look silly.
@@ -620,6 +607,7 @@ gglogistic <- function(
           label = format({{predictor}}, digits = 3)), # TODO make configurable
         data = inverse.prediction.df,
         y = 0,
+        alpha = alpha,
         show.legend = F) # Don't show a little letter "a" in legend.
       )
     }
@@ -628,19 +616,87 @@ gglogistic <- function(
       p <- p + make.inverse(individual.rows, {{treatment}}, 1)
     }
 
+
+    make.inverse2 <- function(d, alpha) {
+      treatment.and.replicate.names <-
+        d %>%
+        dplyr::select({{treatment}}, {{replicate}}) %>% # DIFF - both vars
+        unique()                                        # DIFF - no pull()
+
+      replicate.names <- treatment.and.replicate.names %>% # DIFF - need to pull this out separately
+        dplyr::select({{replicate}}) %>% dplyr::pull(1)
+
+      treatment.names <- treatment.and.replicate.names %>% # DIFF - need to pull this out separately
+        dplyr::select({{treatment}}) %>% dplyr::pull(1)
+
+      get.rows.matching.replicate.name <- function(replicate.name) {
+        d %>% dplyr::filter({{replicate}} == replicate.name)
+      }
+
+      # Make regression for each level in group.var.
+      regressions.by.replicate <-
+        lapply(replicate.names,
+               function(replicate.name){
+                 logisticat::logistic.regression(
+                   d %>% dplyr::filter({{replicate}} == replicate.name),
+                   predictor = {{predictor}},
+                   outcome = outcome)})
+
+      # Calculate intersection for each regression we just made.
+      replicate.intersections <-
+        lapply(regressions.by.replicate,
+               # Anonymous function because I never learned how else to
+               # pass two arguments with lapply().
+               function(regression.for.a.replicate) {
+                 logisticat::inverse.predict(regression.for.a.replicate,
+                                             probability.of.interest)}) %>%
+        unlist() # ggplot hates lists in data frames.
+
+      # Populate a new data frame with inverse predictions
+      inverse.prediction.df <-
+        tibble::tibble(
+          {{predictor}} := replicate.intersections,
+          {{treatment}} := treatment.names,
+          {{replicate}} := replicate.names
+        )
+
+      # Return these two geoms as a list because you can't `+` ggproto objects
+      # together unless you have already `+`ed them to a ggplot.
+      list(
+        # Lines from x-axis up to intersection, representing value of predictor
+        # that produces given probability.
+        ggplot2::geom_segment(
+          mapping = ggplot2::aes(xend = {{predictor}}),
+          data = inverse.prediction.df,
+          y = 0,
+          yend = probability.of.interest,
+          alpha = alpha),
+
+        # Label for the line. geom_label_repel is good at getting labels out
+        # of the way, though it doesn't necessarily mean they don't look silly.
+        ggrepel::geom_label_repel(
+          mapping = ggplot2::aes(
+            label = format({{predictor}}, digits = 3)), # TODO make configurable
+          data = inverse.prediction.df,
+          y = 0,
+          alpha = alpha,
+          show.legend = F,) # Don't show a little letter "a" in legend.
+      )
+    }
+
     if(inverse.replicate) {
       if (inverse.treatment){
         # Make replicate lines a bit transparent so they are easy to distinguish
         # from and don't hide the treatment lines.
-        effictive.replicate.alpha <- replicate.alpha # Needs to be <- not =
+        effective.replicate.alpha <- replicate.alpha # Needs to be <- not =
       } else {
         # No point making them transparent if there's nothing else.
         # TODO: Or maybe caller has other geoms for treatment?
         effective.replicate.alpha <- 1
       }
 
-      make.inverse(individual.rows, {{replicate}}, effective.replicate.alpha)
-
+      p <- p + make.inverse2(individual.rows, effective.replicate.alpha)
+      #p <- p + make.inverse(individual.rows, {{replicate}}, effective.replicate.alpha)
     }
   }
 
@@ -649,8 +705,6 @@ gglogistic <- function(
   # AESTHETICS
   # ============================================================================
 
-  print(glue::glue("treatment.colors: {treatment.colors}")) # doesn't print anything if null!!
-  print("here")
   if (!is.null(treatment.colors)){
     # Extract the vector of level values from the factor in the treatment
     # column so that we can pass this same vector as the `breaks` argument
@@ -730,6 +784,5 @@ gglogistic <- function(
       text             = ggplot2::element_text(size = 12)
     )
 
-  View(p)
   p
 }

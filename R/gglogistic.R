@@ -6,25 +6,16 @@
 #' @param failure.counts Column representing number of failures per observation.
 #' @param treatment Treatment variable.
 #' @param replicate Within-treatment replicates.
-#' @param line.var Variable to plot regression curves for. Must be the same as
-#'                 `treatment` or `replicate`, or the character vector "both"
-#'                 to plot both. Pass NULL to hide. Defaults to same variable
-#'                 as `treatment`. y-axis represents predicted probability ad
-#'                 each value of predictor.
-#' @param point.var Variable to represent with points. Must be the same as
-#'                 `treatment` or `replicate`, or the character vector "both"
-#'                 to plot both. Pass NULL to hide. Defaults to NULL. y-axis
-#'                 value represents fraction of successes in each observation
-#'                 (for `replicate`) or across all observations with the
-#'                 same treatment and same predictor (for `treatment`).
-#' @param boxplot.var Variable to represent with points. Must be the same as
-#'                 `treatment` or `replicate`, or the character vector "both"
-#'                 to plot both. Pass NULL to hide. Defaults to NULL. y-axis
-#'                 has same meaning as for `point.var`.
-#' @param inverse.var Variable to draw lines representing inverse predictions
-#'                    for. Must be the same as `treatment` or `replicate`, or
-#'                    the character vector "both" to plot both. Pass NULL to
-#'                    hide. Defaults to same variable as `line.var`.
+#' @param line.var Variable to plot regression curves for: "both" (default),
+#'                 "treatment", "replicate", or "none".
+#' @param point.var Variable to plot points for: "both", "treatment", "replicate",
+#'                  or "none" (default). y-value represents fraction of
+#'                  successes in each treatment or replicate.
+#' @param boxplot.var Variable to plot boxplots for: "both", "treatment",
+#'                    "replicate", or "none" (default).
+#' @param inverse.var Variable to draw lines at inverse predictions for:
+#'                    "both", "treatment", "replicate", "none" or "line"
+#'                    (same as whatever was specified for line.var; default).
 #' @param probability.of.interest Calculate predictor value in each group that
 #'        would yield this probability.
 #' @param xlabel Label for x-axis.
@@ -68,9 +59,9 @@ gglogistic <- function(
   treatment,
   replicate               = NULL,
   line.var                = "both",
-  point.var               = NULL,
-  boxplot.var             = NULL,
-  inverse.var             = NULL, # Will be interpreted as line.var if missing.
+  point.var               = "none",
+  boxplot.var             = "none",
+  inverse.var             = "line", # Will be interpreted as line.var if missing.
   probability.of.interest = 0.5,
 
   # Describing data.
@@ -136,171 +127,53 @@ gglogistic <- function(
   }
 
   # For each geom we can draw, figure out which of the following was specified:
-  # - NULL:           Don't draw it.
-  # - Variable name:  Display treatment if it matches treatment, display
-  #                    replicate if it matches replicate, else error.
-  # - String:         If it is the string "both", display both treatment and
-  #                    replicate, if it is the same as the treatment or
-  #                    replicate, display that, else error.
+  # - "none":         Don't draw it.
+  # - "treatment":    Display treatment.
+  # - "replicate":    Display replicate.
+  # - "both":         Display treatment and replicate.
+  # - "line":         Do whatever we are doing for line.var. Only applies to
+  #                   inverse.var
   #
   # When displaying the treatment, we pool data from all replicates, rather than
   # doing something more sophisticated like taking the means.
-  #
-  # Note: to test if an argument was a string or variable name, we first need
-  # to substitute() it or typeof() will cause an object not found error for
-  # variable names.
-  line.treatment <- F
-  line.replicate <- F
-  if (!is.null(line.var))
-  {
-    if (typeof(substitute(line.var)) == "character"){
-      # Safe to test against strings inside here.
-      if(line.var == "both"){
-        # Plot both. Note if the caller named a variable "both" they'll get
-        # treatment and replicate both plotted instead of their `both` variable.
-        line.treatment <- T
-        line.replicate <- T
-      } else if (line.var == rlang::as_name(treatment)){
-        # Plot treatment.
-        line.treatment <- T
-      } else if (line.var == rlang::as_name(replicate)){
-        # Plot replicate.
-        line.replicate <- T
-      } else {
-        warning(glue::glue("unknown variable name for line.var: {line.var}. Must be either same name as treatment or replicate, 'both', or NULL."))
-      }
-    } else if (typeof(substitute(line.var)) == "symbol") {
-      if (rlang::as_name(substitute(line.var)) == rlang::as_name(treatment)){
-        line.treatment <- T
-      } else if (rlang::as_name(substitute(line.var)) == rlang::as_name(replicate)) {
-        line.replicate <- T
-      } else {
-        warning(glue::glue("unknown variable name for line.var: {rlang::as_name(substitute(line.var))}. Must be either same name as treatment or replicate, 'both', or NULL."))
-      }
-    } else {
-      warning(glue::glue("line.var must be character vector or variable name."))
-    }
+  illegal.var <- function(var.name, value, extra.opts = c()){
+    opts = c("none", "treatment", "replicate", "both", extra.opts)
+    warning(
+      paste0("Invalid value for parameter ", var.name, ": ", value,
+             "Must be one of: ", paste(opts, collapse = ", ")),
+      call. = F)
   }
 
-  # Same logic for the other geoms as we just did above.
-  point.treatment <- F
-  point.replicate <- F
-  if (!is.null(point.var)){
-    if (typeof(substitute(point.var)) == "character"){
-      # Safe to test against strings inside here.
-      if(point.var == "both"){
-        # Plot both. Note if the caller named a variable "both" they'll get
-        # treatment and replicate both plotted instead of their `both` variable.
-        point.treatment <- T
-        point.replicate <- T
-      } else if (point.var == rlang::as_name(treatment)){
-        # Plot treatment.
-        point.treatment <- T
-      } else if (point.var == rlang::as_name(replicate)){
-        # Plot replicate.
-        point.replicate <- T
-      } else {
-        warning(glue::glue("unknown variable name for point.var: {point.var}. Must be either same name as treatment or replicate, 'both', or NULL."))
-      }
-    } else if (typeof(substitute(point.var)) == "symbol") {
-      if (rlang::as_name(substitute(point.var)) == rlang::as_name(treatment)){
-        point.treatment <- T
-      } else if (rlang::as_name(substitute(point.var)) == rlang::as_name(replicate)) {
-        point.replicate <- T
-      } else {
-        warning(glue::glue("unknown variable name for point.var: {rlang::as_name(substitute(point.var))}. Must be either same name as treatment or replicate, 'both', or NULL."))
-      }
-    } else {
-      warning(glue::glue("point.var must be character vector or variable name."))
-    }
-  }
+  switch(line.var %??% "none",
+         "none"      = { line.treatment <- F; line.replicate <- F},
+         "treatment" = { line.treatment <- T; line.replicate <- F},
+         "replicate" = { line.treatment <- F; line.replicate <- T},
+         "both"      = { line.treatment <- T; line.replicate <- T},
+         {illegal.var("line.var", line.var)})
 
+  switch(point.var %??% "none",
+         "none"      = { point.treatment <- F; point.replicate <- F},
+         "treatment" = { point.treatment <- T; point.replicate <- F},
+         "replicate" = { point.treatment <- F; point.replicate <- T},
+         "both"      = { point.treatment <- T; point.replicate <- T},
+         {illegal.var("point.var", point.var)})
 
-  boxplot.treatment <- F
-  boxplot.replicate <- F
-  if (!is.null(boxplot.var)){
-    if (typeof(substitute(boxplot.var)) == "character"){
-      # Safe to test against strings inside here.
-      if(boxplot.var == "both"){
-        # Plot both. Note if the caller named a variable "both" they'll get
-        # treatment and replicate both plotted instead of their `both` variable.
-        boxplot.treatment <- T
-        boxplot.replicate <- T
-      } else if (boxplot.var == rlang::as_name(treatment)){
-        # Plot treatment.
-        boxplot.treatment <- T
-      } else if (boxplot.var == rlang::as_name(replicate)){
-        # Plot replicate.
-        boxplot.replicate <- T
-      } else {
-        warning(glue::glue("unknown variable name for boxplot.var: {boxplot.var}. Must be either same name as treatment or replicate, 'both', or NULL."))
-      }
-    } else if (typeof(substitute(boxplot.var)) == "symbol") {
-      if (rlang::as_name(substitute(boxplot.var)) == rlang::as_name(treatment)){
-        boxplot.treatment <- T
-      } else if (rlang::as_name(substitute(boxplot.var)) == rlang::as_name(replicate)) {
-        boxplot.replicate <- T
-      } else {
-        warning(glue::glue("unknown variable name for boxplot.var: {rlang::as_name(substitute(boxplot.var))}. Must be either same name as treatment or replicate, 'both', or NULL."))
-      }
-    } else {
-      warning(glue::glue("boxplot.var must be character vector or variable name."))
-    }
-  }
+  switch(boxplot.var %??% "none",
+         "none"      = { boxplot.treatment <- F; boxplot.replicate <- F},
+         "treatment" = { boxplot.treatment <- T; boxplot.replicate <- F},
+         "replicate" = { boxplot.treatment <- F; boxplot.replicate <- T},
+         "both"      = { boxplot.treatment <- T; boxplot.replicate <- T},
+         {illegal.var("boxplot.var", boxplot.var)})
 
-
-  # The other thing we can draw is lines showing where each treatment or
-  # replicate reached <probability.of.interest> on the y-axis. This isn't a
-  # "legit" geom but just something bespoke we're assembling.
-  inverse.treatment <- F
-  inverse.replicate <- F
-  if (is.null(inverse.var)){
-    # If it is NULL, it could either be NULL because the caller explicitly
-    # passed NULL as an argument, which we interpret as "don't plot it", or
-    # because NULL is the default value, which we interpret as "plot it,
-    # specifically, plot whatever variable is in `line.var`.
-    # Despite what I've read, `missing()` does NOT have the right semantics for
-    # this. `missing()` returns TRUE for arguments that have had NULL passed
-    # EXPLICITLY. We have to inspect R representation of the actual call itself,
-    # and even then we'll get the wrong answer without names()
-    inverse.var.is.missing <-
-      !("inverse.var" %in% names(as.list(match.call(expand.dots=FALSE))))
-    if (inverse.var.is.missing){
-      inverse.treatment <- line.treatment
-      inverse.replicate <- line.replicate
-    } else {
-      # Do nothing, already F
-    }
-  } else {
-    if (typeof(substitute(inverse.var)) == "character"){
-      # Safe to test against strings inside here.
-      if(inverse.var == "both"){
-        # Plot both. Note if the caller named a variable "both" they'll get
-        # treatment and replicate both plotted instead of their `both` variable.
-        inverse.treatment <- T
-        inverse.replicate <- T
-      } else if (inverse.var == rlang::as_name(treatment)){
-        # Plot treatment.
-        inverse.treatment <- T
-      } else if (inverse.var == rlang::as_name(replicate)){
-        # Plot replicate.
-        inverse.replicate <- T
-      } else {
-        warning(glue::glue("unknown variable name for inverse.var: {inverse.var}. Must be either same name as treatment or replicate, 'both', or NULL."))
-      }
-    } else if (typeof(substitute(inverse.var)) == "symbol") {
-      if (rlang::as_name(substitute(inverse.var)) == rlang::as_name(treatment)){
-        inverse.treatment <- T
-      } else if (rlang::as_name(substitute(inverse.var)) == rlang::as_name(replicate)) {
-        inverse.replicate <- T
-      } else {
-        warning(glue::glue("unknown variable name for inverse.var: {rlang::as_name(substitute(inverse.var))}. Must be either same name as treatment or replicate, 'both', or NULL."))
-      }
-    } else {
-      warning(glue::glue("inverse.var must be character vector or variable name."))
-    }
-  }
-
+  switch(inverse.var %??% "none",
+         "none"      = { inverse.treatment <- F; inverse.replicate <- F},
+         "treatment" = { inverse.treatment <- T; inverse.replicate <- F},
+         "replicate" = { inverse.treatment <- F; inverse.replicate <- T},
+         "both"      = { inverse.treatment <- T; inverse.replicate <- T},
+         "line"      = {
+           inverse.treatment <- line.treatment
+           inverse.replicate <- line.replicate},
+         {illegal.var("inverse.var", inverse.var, "line")})
 
   # We'll only draw lines for inverse prediction if we have a probability that's
   # valid. We need a regression to do this, even if it isn't plotted.

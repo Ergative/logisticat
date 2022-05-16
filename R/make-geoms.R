@@ -30,7 +30,7 @@ make.regression.line <- function(individual.rows, group, color, alpha=1, ...) {
 
 #' Create a geom for a box plot of success fractions.
 #'
-#' @param fraction.data Data frame with colum representing fraction of success.
+#' @param fraction.data Data frame with column representing fraction of success.
 #' @param x x-axis data variable, should be a predictor.
 #' @param y y-axis data variable, fraction of successes in range \[0,1\].
 #' @param group Data variable for groups and color.

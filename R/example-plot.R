@@ -13,7 +13,7 @@ example.plot <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      boxplot.var = "beaker")
+      boxplot.var = "replicate")
 }
 
 jwidth = 1
@@ -30,8 +30,7 @@ xlt <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = "ration",
-      inverse.var = NULL,
+      line.var = "treatment",
       jitter.width = jwidth)
 }
 
@@ -47,8 +46,8 @@ xpt <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = NULL,
-      point.var = "ration",
+      line.var = "none",
+      point.var = "treatment",
       jitter.width = jwidth)
 }
 
@@ -64,8 +63,8 @@ xbt <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = NULL,
-      boxplot.var = "ration",
+      line.var = "none",
+      boxplot.var = "treatment",
       jitter.width = jwidth)
 }
 
@@ -81,8 +80,8 @@ xit <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = NULL,
-      inverse.var = "ration",
+      line.var = "none",
+      inverse.var = "treatment",
       jitter.width = jwidth)
 }
 
@@ -98,8 +97,8 @@ xlit <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = "ration",
-      inverse.var = "ration",
+      line.var = "treatment",
+      inverse.var = "treatment",
       jitter.width = jwidth)
 }
 
@@ -115,9 +114,9 @@ xplit <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = "ration",
-      point.var = "ration",
-      inverse.var = "ration",
+      line.var = "treatment",
+      point.var = "treatment",
+      inverse.var = "treatment",
       jitter.width = jwidth)
 }
 
@@ -138,8 +137,8 @@ xlr <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = "beaker",
-      inverse.var = NULL,
+      line.var = "replicate",
+      inverse.var = "none",
       jitter.width = jwidth)
 }
 
@@ -155,8 +154,8 @@ xpr <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = NULL,
-      point.var = "beaker",
+      line.var = "none",
+      point.var = "replicate",
       jitter.width = jwidth)
 }
 
@@ -172,8 +171,8 @@ xbr <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = NULL,
-      boxplot.var = "beaker",
+      line.var = "none",
+      boxplot.var = "replicate",
       jitter.width = jwidth)
 }
 
@@ -189,8 +188,8 @@ xir <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = NULL,
-      inverse.var = "beaker",
+      line.var = "none",
+      inverse.var = "replicate",
       jitter.width = jwidth)
 }
 
@@ -206,8 +205,8 @@ xlir <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = "beaker",
-      inverse.var = "beaker",
+      line.var = "replicate",
+      inverse.var = "replicate",
       jitter.width = jwidth)
 }
 
@@ -223,9 +222,9 @@ xplir <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = "beaker",
-      point.var = "beaker",
-      inverse.var = "beaker",
+      line.var = "replicate",
+      point.var = "replicate",
+      inverse.var = "replicate",
       jitter.width = jwidth)
 }
 
@@ -246,7 +245,7 @@ xlb <- function (){
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
       line.var = "both",
-      inverse.var = NULL,
+      inverse.var = "none",
       jitter.width = jwidth)
 }
 
@@ -262,7 +261,7 @@ xpb <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = NULL,
+      line.var = "none",
       point.var = "both",
       jitter.width = jwidth)
 }
@@ -279,7 +278,7 @@ xbb <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = NULL,
+      line.var = "none",
       boxplot.var = "both",
       jitter.width = jwidth)
 }
@@ -296,7 +295,7 @@ xib <- function (){
       xlabel = "Age (days)",
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
-      line.var = NULL,
+      line.var = "none",
       inverse.var = "both",
       jitter.width = jwidth)
 }

@@ -12,9 +12,9 @@ gglogistic(
   treatment,
   replicate = NULL,
   line.var = "both",
-  point.var = NULL,
-  boxplot.var = NULL,
-  inverse.var = NULL,
+  point.var = "none",
+  boxplot.var = "none",
+  inverse.var = "line",
   probability.of.interest = 0.5,
   xlabel = NULL,
   ylabel = NULL,
@@ -41,28 +41,19 @@ gglogistic(
 
 \item{replicate}{Within-treatment replicates.}
 
-\item{line.var}{Variable to plot regression curves for. Must be the same as
-\code{treatment} or \code{replicate}, or the character vector "both"
-to plot both. Pass NULL to hide. Defaults to same variable
-as \code{treatment}. y-axis represents predicted probability ad
-each value of predictor.}
+\item{line.var}{Variable to plot regression curves for: "both" (default),
+"treatment", "replicate", or "none".}
 
-\item{point.var}{Variable to represent with points. Must be the same as
-\code{treatment} or \code{replicate}, or the character vector "both"
-to plot both. Pass NULL to hide. Defaults to NULL. y-axis
-value represents fraction of successes in each observation
-(for \code{replicate}) or across all observations with the
-same treatment and same predictor (for \code{treatment}).}
+\item{point.var}{Variable to plot points for: "both", "treatment", "replicate",
+or "none" (default). y-value represents fraction of
+successes in each treatment or replicate.}
 
-\item{boxplot.var}{Variable to represent with points. Must be the same as
-\code{treatment} or \code{replicate}, or the character vector "both"
-to plot both. Pass NULL to hide. Defaults to NULL. y-axis
-has same meaning as for \code{point.var}.}
+\item{boxplot.var}{Variable to plot boxplots for: "both", "treatment",
+"replicate", or "none" (default).}
 
-\item{inverse.var}{Variable to draw lines representing inverse predictions
-for. Must be the same as \code{treatment} or \code{replicate}, or
-the character vector "both" to plot both. Pass NULL to
-hide. Defaults to same variable as \code{line.var}.}
+\item{inverse.var}{Variable to draw lines at inverse predictions for:
+"both", "treatment", "replicate", "none" or "line"
+(same as whatever was specified for line.var; default).}
 
 \item{probability.of.interest}{Calculate predictor value in each group that
 would yield this probability.}

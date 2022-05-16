@@ -7,7 +7,7 @@
 make.boxplot(fraction.data, x, y, group, fill.alpha = 0.25, ...)
 }
 \arguments{
-\item{fraction.data}{Data frame with colum representing fraction of success.}
+\item{fraction.data}{Data frame with column representing fraction of success.}
 
 \item{x}{x-axis data variable, should be a predictor.}
 

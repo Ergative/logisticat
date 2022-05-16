@@ -83,6 +83,15 @@ list.df.rows <- function(data){
 }
 
 
+#' C#-style null-coalescing operator.
+#' @keywords internal
+#' @return Second argument if first argument is NULL, else first argument.
+`%??%` <- function(maybe.null, replacement){
+  if (is.null(maybe.null)) return(replacement)
+  return(maybe.null)
+}
+
+
 log.caller <- function(){
   caller <- sys.call(which=1)
   print (caller)

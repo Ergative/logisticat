@@ -66,10 +66,10 @@ test_that("gglotistic makes desired geoms", {
       ylabel = "Metamorphic Competence",
       treatment.label = "Algal Ration",
       treatment.colors = c("high" = "#f2af09","low" = "#ea1578"),
-      line.var = "ration",
-      boxplot.var = "ration",
-      point.var = "ration",
-      inverse.var = "ration")
+      line.var = "treatment",
+      boxplot.var = "treatment",
+      point.var = "treatment",
+      inverse.var = "treatment")
 
   testthat::expect_equal(
     are.all.required.geoms.present(p, c("GeomLine",

@@ -22,18 +22,25 @@ The goal of logisticat is to ...
 
 ## Installation
 
-You can install the development version of logisticat from [GitHub](https://github.com/) with:
+There are two ways you could use this package. The "normal" way is to install 
+the development version of logisticat from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("Ergative/logisticat")
 ```
 
-You can uninstall it with:
+You can then uninstall it with:
 
 ``` r
 remove.packages("logisticat")
 ```
+
+The other way to use this package is to download the single .R file implementing
+the whole package, which gets automatically generated and put in 
+[/generated/logisticat-single-file.R](https://github.com/Ergative/logisticat/blob/master/generated/logisticat-single-file.R).
+You can then put this file wherever you want and source it using RStudio or
+`source("logisticat-single-file.R")`.
 
 ## Example
 

@@ -17,23 +17,40 @@ from datetime import date
 from os import listdir
 from os.path import isfile, join
 
+def comment(line: str) -> str:
+  """Prefix a # to make a Python comment."""
+  return "# " + line
+
 def make_header(name: str, descriptionFile: str, licenseFile:str) -> str:
   desc = ""
   lic = ""
   with open(descriptionFile, "r") as f:
-    desc = "".join(["# " + line for line in f])
+    desc = "".join([comment(line) for line in f])
   with open(licenseFile, "r") as f:
-    lic = "".join(["# " + line for line in f])
+    lic = "".join([comment(line) for line in f])
     
-  return "\n".join(["# " + name + "\n", lic, "# This source file was automatically" +\
+  advice = comment("NOTE: You will need to install the following packages:\n") +\
+    "\n".join([comment(line) for line in parse_package_dependencies(descriptionFile)]) +\
+    "\n"
+    
+  return "\n".join([comment(name) + "\n", lic, comment("This source file was automatically" +\
                     " generated from an R project on " +\
-                    date.today().strftime("%Y/%m/%d") + ".\n", desc]) + "\n\n"
+                    date.today().strftime("%Y/%m/%d") + ".\n"), advice, desc]) + "\n\n"
 
 def get_all_r_files(directory: str) -> list:
   """Returns a list of all .R files in a directory."""
   return [f for f in listdir(directory) if isfile(join(directory, f)) and f.endswith(".R")]
 
-def parse_imports(namespace_file: str) -> list:
+def parse_package_dependencies(description_file: str) -> list:
+  """Return a list of packages that this file will depend on.
+  
+  This is just everything listed under Imports in the DESCRIPTION file.
+  """
+  with open(description_file, "r") as f:
+    contents = f.read()
+    return [s.strip() for s in contents.split("Imports:")[1].split("Suggests:")[0].split(",")]
+
+def parse_importFrom(namespace_file: str) -> list:
   """Return [namespace, symbol] pairs from NAMESPACE file.
   
   These are parsed from all lines of the form:
@@ -81,7 +98,7 @@ def emit_symbol_load(namespace: str, symbol: str) -> str:
 
 def build(name, descriptionFile, licenseFile, rDirectory, namespaceFile, exludeList):
   header = make_header(name, descriptionFile, licenseFile)
-  imports = parse_imports(namespaceFile)
+  imports = parse_importFrom(namespaceFile)
   importCode = emit_file_name_comment("IMPORTED SYMBOLS") +\
     "\n".join([emit_symbol_load(pair[0], pair[1]) for pair in imports]) + "\n\n"
   

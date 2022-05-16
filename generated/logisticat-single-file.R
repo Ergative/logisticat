@@ -5,6 +5,19 @@
 
 # This source file was automatically generated from an R project on 2022/05/16.
 
+# NOTE: You will need to install the following packages:
+# dplyr
+# ggplot2
+# ggrepel
+# glue
+# grDevices
+# magrittr
+# rlang (>= 0.4.11)
+# scales
+# stats
+# tibble
+# tidyr
+
 # Package: logisticat
 # Title: Plot Inverse Predictions for Logistic Regressions
 # Version: 0.0.0.9000

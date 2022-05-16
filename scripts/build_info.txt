@@ -1,0 +1,8 @@
+name:logisticat
+descriptionFile:DESCRIPTION
+licenseFile:LICENSE
+rDirectory:R
+namespaceFile:NAMESPACE
+excludeList:scripts/files_to_exclude.txt
+outFile:logisticat-single-file.R
+outDir:generated

@@ -10,7 +10,7 @@ gglogistic(
   success.counts,
   failure.counts,
   treatment,
-  replicate,
+  replicate = NULL,
   line.var = "both",
   point.var = NULL,
   boxplot.var = NULL,

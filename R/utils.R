@@ -44,3 +44,36 @@ nybble2hex <- function(nybble) {
   nybble.names[[nybble + 1]] # 1-indexed.
 
 }
+
+
+#' Get a vector from a data frame column.
+#'
+#' @param data Data frame.
+#' @param column Column to extract - can be used with \{\{\}\}.
+#'
+#' @return Vector of column contents.
+#' @export
+column.to.vector <- function(data, column) {
+  column.name <- as_name(rlang::ensym(column))
+  data[[column.name]]
+}
+
+
+#' Get a list a row vectors from a data frame.
+#'
+#' @param data Data frame.
+#'
+#' @return A list, with one vector for each row.
+#' @export
+list.df.rows <- function(data){
+  # See https://stackoverflow.com/a/14370455/4104189
+  lapply(stats::setNames(split(data, seq(nrow(data))), rownames(data)),
+         unlist) # Unlist so that we have vector elements instead of tibbles.
+
+}
+
+
+log.caller <- function(){
+  caller <- sys.call(which=1)
+  print (caller)
+}

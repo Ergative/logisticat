@@ -84,7 +84,6 @@ gglogistic <- function(
   # INTERPRETING ARGUMENTS
   # ============================================================================
 
-
   # This section just figures out WHAT the caller asked us to plot and IF
   # it is possible, trying to report problems in a helpful way.
 
@@ -434,43 +433,29 @@ gglogistic <- function(
   # TRADITIONAL GEOMS + OUR "INVERSE PREDICTION INTERSECTION" "GEOM"
   # ============================================================================
 
-  if (plot.line) {
-    # Closure because almost everything is the same no matter which we plot.
-    # We just need to choose the group and glm will figure out the rest.
-    # We also vary alpha if both variables are being plotted.
-    make.line <- function(group.var, alpha) {
-      ggplot2::geom_line(
-        # For this geom, the same data frame works for both treatment
-        # and for replicate.
-        data = individual.rows,
-        stat = "smooth",
-        mapping = ggplot2::aes(group = {{group.var}}, color = {{treatment}}),
-        formula = y ~ x,
-        method = "glm",
-        method.args = list(family = "binomial"),
-        se = F,
-        na.rm = T,
-        size = 1,
-        alpha = alpha
-      )
+  effective.replicate.alpha <- function(treatment.plotted){
+    if (treatment.plotted){
+      # Make replicate lines a bit transparent so they are easy to distinguish
+      # from and don't hide the treatment lines.
+      return(replicate.alpha)
+    } else {
+      # No point making them transparent if there's nothing else.
+      return(1)
     }
+  }
 
+  if (plot.line) {
     if(line.treatment) {
-      p <- p + make.line({{treatment}}, 1)
+      p <- p + make.regression.line(individual.rows = individual.rows,
+                                    group = {{treatment}},
+                                    color = {{treatment}})
     }
 
     if(line.replicate){
-      if (line.treatment){
-        # Make replicate lines a bit transparent so they are easy to distinguish
-        # from and don't hide the treatment lines.
-        effective.replicate.alpha <- replicate.alpha
-      } else {
-        # No point making them transparent if there's nothing else.
-        # TODO: Or maybe caller has other geoms for treatment?
-        effective.replicate.alpha <- 1
-      }
-
-      p <- p + make.line(interaction({{treatment}}, {{replicate}}), effective.replicate.alpha)
+      p <- p + make.regression.line(individual.rows = individual.rows,
+                                    group = interaction({{treatment}}, {{replicate}}),
+                                    color = {{treatment}},
+                         alpha = effective.replicate.alpha(line.treatment))
     }
   }
 
@@ -480,223 +465,68 @@ gglogistic <- function(
     # are fractions from all pooled data per predictor value, not just every
     # fraction from every observation separately, which is what would happen
     # for treatment by default.
-    make.point <- function(d) {
-      # TODO make configurable - not everyone will need this.
-      # In the common case that there are only several discrete "steps" along
-      # the predictor axis that have been measured (e.g. observations taken
-      # every day), we want some jitter so points don't overlap, but the height
-      # is meaningful, so only jitter the x-values.
-      # We also want dodge, otherwise it becomes hard to see any patterns in
-      # the data with all treatments jumbled together.
-      # We keep the jitter seed constant, so that users don't get different
-      # plots every time they run this.
-      ggplot2::geom_point(
-        data = d,
-        position = ggplot2::position_jitterdodge(jitter.width = jitter.width,
-                                                 jitter.height = 0,
-                                                 dodge.width = dodge.width,
-                                                 seed = 114))
-    }
 
     if (point.treatment) {
-      p <- p + make.point(treatment.fractions)
+      p <- p + make.point(treatment.fractions,
+                          jitter.width = jitter.width,
+                          dodge.width = dodge.width)
     }
 
     if (point.replicate) {
-      p <- p + make.point(replicate.fractions)
+      p <- p + make.point(replicate.fractions,
+                          jitter.width = jitter.width,
+                          dodge.width = dodge.width,
+                          alpha=effective.replicate.alpha(point.treatment))
     }
   }
 
   if (plot.boxplot) {
-    make.boxplot <- function(d) {
-      # Note these only make sense if the predictor (x-axis) can be organized
-      # meaningfully into discrete units which will show up in the data as
-      # many rows with the same value of predictor - think time steps.
-      #
-      # Two tricky things here:
-      # (1) Grouping data correctly. We want a box per treatment per predictor
-      #     step (e.g., in the common case where it represents time points),
-      #     so we use interaction(predictor, treatment) to bind the group
-      #     aesthetic to their combination.
-      # (2) Controlling boxplot widths. If there are any "missing" group
-      #     values (say, not all treatments were measured for a certain
-      #     predictor step, e.g., in the common case where they are time points),
-      #     then the remaining boxes will fill the full width that would be
-      #     normally allotted to that bunch of boxes. Setting the position
-      #     fixes this.
-      ggplot2::geom_boxplot(
-        data = d,
-        mapping = ggplot2::aes(
-          x = {{predictor}},
-          y = outcome,
-          color = {{treatment}},
-          fill = {{treatment}},
-          group = interaction({{predictor}}, {{treatment}})),
-        #width = boxplot.width, # TODO width of actual BOX, not dodge.
-        position = ggplot2::position_dodge(preserve = "single")
-      )
-    }
-
     if (boxplot.treatment) {
-      p <- p + make.boxplot(treatment.fractions)
+      p <- p + make.boxplot(treatment.fractions, x={{predictor}}, y=outcome,
+                            group={{treatment}}, fill.alpha = fill.alpha)
     }
 
     if (boxplot.replicate) {
-      p <- p + make.boxplot(replicate.fractions)
+      p <- p + make.boxplot(replicate.fractions, x={{predictor}}, y=outcome,
+                            group={{treatment}}, fill.alpha = fill.alpha)
     }
   }
 
   if (plot.inverse) {
-    # Draw horizontal line.
-    p <- p + ggplot2::geom_hline(yintercept = probability.of.interest)
-
-
-    make.inverse <- function(d, group.var, alpha) {
-      group.names <-
-        d %>%
-        dplyr::select({{group.var}}) %>%
-        unique() %>%
-        dplyr::pull(1) # Get first (only) column as vector.
-
-      get.rows.matching.group.name <- function(group.name) {
-        d %>% dplyr::filter({{group.var}} == group.name)
-      }
-
-      # Make regression for each level in group.var.
-      regressions.by.group <-
-        lapply(group.names,
-               function(group.name){
-                 logisticat::logistic.regression(
-                   group.name %>% get.rows.matching.group.name,
-                   predictor = {{predictor}},
-                   outcome = outcome)})
-
-      # Calculate intersection for each regression we just made.
-      group.inverse.predictions <-
-        lapply(regressions.by.group,
-               # Anonymous function because I never learned how else to
-               # pass two arguments with lapply().
-               function(regression.for.a.group) {
-                 logisticat::inverse.predict(regression.for.a.group,
-                                             probability.of.interest)}) %>%
-        unlist() # ggplot hates lists in data frames.
-
-      # Populate a new data frame with inverse predictions
-      inverse.prediction.df <-
-        tibble::tibble(
-          {{predictor}} := group.inverse.predictions,
-          {{treatment}} := group.names
-        )
-
-      # Return these two geoms as a list because you can't `+` ggproto objects
-      # together unless you have already `+`ed them to a ggplot.
-      list(
-        # Lines from x-axis up to intersection, representing value of predictor
-        # that produces given probability.
-        ggplot2::geom_segment(
-        mapping = ggplot2::aes(xend = {{predictor}}),
-        data = inverse.prediction.df,
-        y = 0,
-        yend = probability.of.interest,
-        alpha = alpha),
-
-      # Label for the line. geom_label_repel is good at getting labels out
-      # of the way, though it doesn't necessarily mean they don't look silly.
-      ggrepel::geom_label_repel(
-        mapping = ggplot2::aes(
-          label = format({{predictor}}, digits = 3)), # TODO make configurable
-        data = inverse.prediction.df,
-        y = 0,
-        alpha = alpha,
-        show.legend = F) # Don't show a little letter "a" in legend.
-      )
-    }
 
     if (inverse.treatment){
-      p <- p + make.inverse(individual.rows, {{treatment}}, 1)
-    }
+      inverse.prediction.df <- inverse.predict.by.treatment(
+        data = individual.rows,
+        predictor = {{predictor}},
+        outcome = {{outcome}},
+        treatment = {{treatment}},
+        probability = probability.of.interest)
 
-
-    make.inverse2 <- function(d, alpha) {
-      treatment.and.replicate.names <-
-        d %>%
-        dplyr::select({{treatment}}, {{replicate}}) %>% # DIFF - both vars
-        unique()                                        # DIFF - no pull()
-
-      replicate.names <- treatment.and.replicate.names %>% # DIFF - need to pull this out separately
-        dplyr::select({{replicate}}) %>% dplyr::pull(1)
-
-      treatment.names <- treatment.and.replicate.names %>% # DIFF - need to pull this out separately
-        dplyr::select({{treatment}}) %>% dplyr::pull(1)
-
-      get.rows.matching.replicate.name <- function(replicate.name) {
-        d %>% dplyr::filter({{replicate}} == replicate.name)
-      }
-
-      # Make regression for each level in group.var.
-      regressions.by.replicate <-
-        lapply(replicate.names,
-               function(replicate.name){
-                 logisticat::logistic.regression(
-                   d %>% dplyr::filter({{replicate}} == replicate.name),
-                   predictor = {{predictor}},
-                   outcome = outcome)})
-
-      # Calculate intersection for each regression we just made.
-      replicate.intersections <-
-        lapply(regressions.by.replicate,
-               # Anonymous function because I never learned how else to
-               # pass two arguments with lapply().
-               function(regression.for.a.replicate) {
-                 logisticat::inverse.predict(regression.for.a.replicate,
-                                             probability.of.interest)}) %>%
-        unlist() # ggplot hates lists in data frames.
-
-      # Populate a new data frame with inverse predictions
-      inverse.prediction.df <-
-        tibble::tibble(
-          {{predictor}} := replicate.intersections,
-          {{treatment}} := treatment.names,
-          {{replicate}} := replicate.names
-        )
-
-      # Return these two geoms as a list because you can't `+` ggproto objects
-      # together unless you have already `+`ed them to a ggplot.
-      list(
-        # Lines from x-axis up to intersection, representing value of predictor
-        # that produces given probability.
-        ggplot2::geom_segment(
-          mapping = ggplot2::aes(xend = {{predictor}}),
-          data = inverse.prediction.df,
-          y = 0,
-          yend = probability.of.interest,
-          alpha = alpha),
-
-        # Label for the line. geom_label_repel is good at getting labels out
-        # of the way, though it doesn't necessarily mean they don't look silly.
-        ggrepel::geom_label_repel(
-          mapping = ggplot2::aes(
-            label = format({{predictor}}, digits = 3)), # TODO make configurable
-          data = inverse.prediction.df,
-          y = 0,
-          alpha = alpha,
-          show.legend = F,) # Don't show a little letter "a" in legend.
+      p <- p + make.inverse.prediction.geoms(
+        inverse.prediction.df = inverse.prediction.df,
+        predictor = {{predictor}},
+        probability = probability.of.interest,
+        alpha = 1,
+        digits = 3
       )
     }
 
     if(inverse.replicate) {
-      if (inverse.treatment){
-        # Make replicate lines a bit transparent so they are easy to distinguish
-        # from and don't hide the treatment lines.
-        effective.replicate.alpha <- replicate.alpha # Needs to be <- not =
-      } else {
-        # No point making them transparent if there's nothing else.
-        # TODO: Or maybe caller has other geoms for treatment?
-        effective.replicate.alpha <- 1
-      }
+      inverse.prediction.df <- inverse.predict.by.replicate(
+        data = individual.rows,
+        predictor = {{predictor}},
+        outcome = {{outcome}},
+        treatment = {{treatment}},
+        replicate = {{replicate}},
+        probability = probability.of.interest)
 
-      p <- p + make.inverse2(individual.rows, effective.replicate.alpha)
-      #p <- p + make.inverse(individual.rows, {{replicate}}, effective.replicate.alpha)
+      p <- p + make.inverse.prediction.geoms(
+        inverse.prediction.df = inverse.prediction.df,
+        predictor = {{predictor}},
+        probability = probability.of.interest,
+        alpha = effective.replicate.alpha(inverse.treatment),
+        digits = 3
+      )
     }
   }
 

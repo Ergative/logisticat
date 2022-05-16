@@ -1,8 +1,6 @@
 # logisticat
 
-# YEAR: 2022
-# COPYRIGHT HOLDER: Peter Nilsson
-
+# By Peter Nilsson
 # This source file was automatically generated from an R project on 2022/05/16.
 
 # NOTE: You will need to install the following packages:

@@ -23,17 +23,20 @@ def comment(line: str) -> str:
 
 def make_header(name: str, descriptionFile: str, licenseFile:str) -> str:
   desc = ""
-  lic = ""
+  author = ""
   with open(descriptionFile, "r") as f:
     desc = "".join([comment(line) for line in f])
   with open(licenseFile, "r") as f:
-    lic = "".join([comment(line) for line in f])
+    for line in f:
+      prop = line.split(":")
+      if prop[0] == "COPYRIGHT HOLDER":
+        author = prop[1].strip()
     
   advice = comment("NOTE: You will need to install the following packages:\n") +\
     "\n".join([comment(line) for line in parse_package_dependencies(descriptionFile)]) +\
     "\n"
     
-  return "\n".join([comment(name) + "\n", lic, comment("This source file was automatically" +\
+  return "\n".join([comment(name) + "\n", comment("By " + author), comment("This source file was automatically" +\
                     " generated from an R project on " +\
                     date.today().strftime("%Y/%m/%d") + ".\n"), advice, desc]) + "\n\n"
 

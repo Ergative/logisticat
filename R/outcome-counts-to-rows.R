@@ -19,28 +19,25 @@
 #' @param outcome Name to use for the outcome column.
 #'
 #' @return A `data.frame` with counts represented as repeated rows with a
-#'   number 1 representing a success or a 0 represnting a failure.
+#'   number 1 representing a success or a 0 representing a failure.
 #' @export
 outcome.counts.to.rows <- function(data, success.counts, failure.counts, outcome) {
-  success.counts.sym <- rlang::ensym(success.counts)
-  failure.counts.sym <- rlang::ensym(failure.counts)
-  outcome.sym        <- rlang::ensym(outcome)
 
   # Make as many copies of each row as there were successes,
   # throw away the success/failure counts, and mark each one
   # has having the "1" outcome.
   successes <- data %>%
-    tidyr::uncount(!!success.counts.sym) %>%
-    dplyr::select(-!!failure.counts.sym) %>%
-    dplyr::mutate(!!outcome.sym := 1)
+    tidyr::uncount({{success.counts}}) %>%
+    dplyr::select(-{{failure.counts}}) %>%
+    dplyr::mutate({{outcome}} := 1)
 
   # Make as many copies of each row as there were failures,
   # throw away the success/failure counts, and mark each one
   # has having the "0" outcome.
   failures <- data %>%
-    tidyr::uncount(!!failure.counts.sym) %>%
-    dplyr::select(-!!success.counts.sym) %>%
-    dplyr::mutate(!!outcome.sym := 0)
+    tidyr::uncount({{failure.counts}}) %>%
+    dplyr::select(-{{success.counts}}) %>%
+    dplyr::mutate({{outcome}} := 0)
 
   # Concatenate all the rows into a single table.
   rbind(successes, failures)

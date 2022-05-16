@@ -78,7 +78,6 @@ metamorphosis <- function() {
 #' Small data set for use testing functions in this package.
 #'
 #' @return A `data.frame` with example data.
-#' @export
 sanity.check <- function() {
   tibble::tribble(
     ~label, ~pass, ~fail,

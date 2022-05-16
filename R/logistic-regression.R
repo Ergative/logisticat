@@ -1,8 +1,8 @@
 #' Make a logistic regression for a binary outcome based on a continuous predictor.
 #'
 #' @param data `data.frame` with the columns named in the other arguments.
-#' @param predictor Continuous predictor variable.
-#' @param outcome Outcome variable with values 1 for success and 0 for failure.
+#' @param predictor Data variable - continuous predictor.
+#' @param outcome Data variable - column with values 1 for success and 0 for failure.
 #'
 #' @return A logistic regression model in a `glm` class object.
 #' @export

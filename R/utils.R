@@ -52,7 +52,6 @@ nybble2hex <- function(nybble) {
 #' @param column Column to extract - can be used with \{\{\}\}.
 #'
 #' @return Vector of column contents.
-#' @export
 column.to.vector <- function(data, column) {
   column.name <- as_name(rlang::ensym(column))
   data[[column.name]]
@@ -64,7 +63,6 @@ column.to.vector <- function(data, column) {
 #' @param data Data frame.
 #'
 #' @return A list, with one vector for each row.
-#' @export
 list.df.rows <- function(data){
   # See https://stackoverflow.com/a/14370455/4104189
   lapply(stats::setNames(split(data, seq(nrow(data))), rownames(data)),

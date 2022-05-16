@@ -17,7 +17,7 @@ outcome.counts.to.rows(data, success.counts, failure.counts, outcome)
 }
 \value{
 A \code{data.frame} with counts represented as repeated rows with a
-number 1 representing a success or a 0 represnting a failure.
+number 1 representing a success or a 0 representing a failure.
 }
 \description{
 Given a \code{data.frame} containing results of a test with two possible outcomes

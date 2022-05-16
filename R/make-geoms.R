@@ -9,7 +9,6 @@
 #' @param ... Additional arguments to pass to the underlying geom.
 #'
 #' @return geom that can be added to a ggplot to show regressions.
-#' @export
 make.regression.line <- function(individual.rows, group, color, alpha=1, ...) {
   ggplot2::geom_line(
     data = {{individual.rows}},
@@ -37,7 +36,6 @@ make.regression.line <- function(individual.rows, group, color, alpha=1, ...) {
 #' @param ... Additional arguments for underlying geom.
 #'
 #' @return A geom of a boxplot.
-#' @export
 make.boxplot <- function(fraction.data, x, y, group, fill.alpha = 0.25, ...) {
   # Note these only make sense if the predictor (x-axis) can be organized
   # meaningfully into discrete units which will show up in the data as
@@ -69,6 +67,16 @@ make.boxplot <- function(fraction.data, x, y, group, fill.alpha = 0.25, ...) {
 }
 
 
+#' Draw "T"-shaped intersection of predicted with probability.
+#'
+#' @param inverse.prediction.df Data frame of invers predictions.
+#' @param predictor Data variable for which inverse prediction was created.
+#' @param probability Probabily for which inverse prediction was run.
+#' @param alpha Opacity in range \[0,1\].
+#' @param digits Digits of inverse predicted values to show.
+#' @param ... Additional arguments to geoms.
+#'
+#' @return A list of geoms.
 make.inverse.prediction.geoms <- function(
   inverse.prediction.df, predictor, probability, alpha = 1, digits = 3, ...){
   list(
@@ -88,7 +96,7 @@ make.inverse.prediction.geoms <- function(
     # of the way, though it doesn't necessarily mean they don't look silly.
     ggrepel::geom_label_repel(
       mapping = ggplot2::aes(
-        label = format({{predictor}}, digits = digits)), # TODO make configurable
+        label = format({{predictor}}, digits = digits)),
       data = inverse.prediction.df,
       y = 0,
       alpha = alpha,

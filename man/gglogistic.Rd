@@ -24,7 +24,8 @@ gglogistic(
   fill.alpha = 0.25,
   replicate.alpha = 0.5,
   jitter.width = 0,
-  dodge.width = 0
+  dodge.width = 0,
+  inverse.predict.digits = 3
 )
 }
 \arguments{
@@ -92,6 +93,8 @@ otherwise cause points to be hard to tell apart.}
 
 \item{dodge.width}{If specified, amount to dodge replicate boxplots or groups
 of points by.}
+
+\item{inverse.predict.digits}{Number of digits to print for inverse predicted values.}
 }
 \value{
 A ggplot object.

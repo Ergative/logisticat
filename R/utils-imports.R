@@ -103,5 +103,14 @@
 #' @keywords internal
 #' @importFrom rlang enquo enquos .data := as_name as_label
 #' @aliases enquo enquos .data := as_name as_label
-#' @export enquo enquos .data := as_name as_label
+NULL
+
+#' Pipe operator
+#'
+#' See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
+#'
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @importFrom magrittr %>%
 NULL

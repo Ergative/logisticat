@@ -9,9 +9,9 @@ logistic.regression(data, predictor, outcome)
 \arguments{
 \item{data}{\code{data.frame} with the columns named in the other arguments.}
 
-\item{predictor}{Continuous predictor variable.}
+\item{predictor}{Data variable - continuous predictor.}
 
-\item{outcome}{Outcome variable with values 1 for success and 0 for failure.}
+\item{outcome}{Data variable - column with values 1 for success and 0 for failure.}
 }
 \value{
 A logistic regression model in a \code{glm} class object.

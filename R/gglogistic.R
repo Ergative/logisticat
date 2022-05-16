@@ -45,6 +45,7 @@
 #'                        geoms at when the same geom is also drawn for
 #'                        `treatment`. Helps distinguish `treatment` from
 #'                        `replicate` values.
+#' @param inverse.predict.digits Number of digits to print for inverse predicted values.
 #'
 #' @return A ggplot object.
 #' @export
@@ -73,7 +74,8 @@ gglogistic <- function(
   fill.alpha              = 0.25,
   replicate.alpha         = 0.5,
   jitter.width            = 0,
-  dodge.width             = 0) {
+  dodge.width             = 0,
+  inverse.predict.digits  = 3) {
 
   # TODO TODO TODO: all of this has assumed replicates are levels that aren't
   # shared across treatments (eg, they don't all have "A", "B", "C")
@@ -331,6 +333,7 @@ gglogistic <- function(
     }
   }
 
+
   # Shorthand for more complicated logic.
   plot.treatment <- line.treatment || point.treatment || boxplot.treatment || inverse.treatment
   plot.replicate <- line.replicate || point.replicate || boxplot.replicate || inverse.replicate
@@ -340,30 +343,6 @@ gglogistic <- function(
   plot.inverse   <- inverse.treatment || inverse.replicate
   need.regressions <- plot.line  || plot.inverse
   need.fractions   <- plot.point || plot.boxplot
-
-# ALL these are right
-  if (F){
-    print(glue::glue("line.treatment: {line.treatment}"))
-    print(glue::glue("point.treatment: {point.treatment}"))
-    print(glue::glue("boxplot.treatment: {boxplot.treatment}"))
-    print(glue::glue("inverse.treatment: {inverse.treatment}"))
-
-    print(glue::glue("line.replicate: {line.replicate}"))
-    print(glue::glue("point.replicate: {point.replicate}"))
-    print(glue::glue("boxplot.replicate: {boxplot.replicate}"))
-    print(glue::glue("inverse.replicate: {inverse.replicate}"))
-  }
-
-  if (F) {
-    print(glue::glue("plot.line: {plot.line}"))
-    print(glue::glue("plot.point: {plot.point}"))
-    print(glue::glue("plot.boxplot: {plot.boxplot}"))
-    print(glue::glue("plot.inverse: {plot.inverse}"))
-
-    print(glue::glue("need.regressions: {need.regressions}"))
-    print(glue::glue("need.fractions: {need.fractions}"))
-  }
-
 
 
   # ============================================================================
@@ -435,8 +414,9 @@ gglogistic <- function(
 
   effective.replicate.alpha <- function(treatment.plotted){
     if (treatment.plotted){
-      # Make replicate lines a bit transparent so they are easy to distinguish
-      # from and don't hide the treatment lines.
+      # Make replicate geoms a bit transparent so they are easy to distinguish
+      # from, and don't hide, the treatment geoms.
+      # Caller can prevent this behavior by simply passing 1 for fill.alpha.
       return(replicate.alpha)
     } else {
       # No point making them transparent if there's nothing else.
@@ -493,7 +473,6 @@ gglogistic <- function(
   }
 
   if (plot.inverse) {
-
     if (inverse.treatment){
       inverse.prediction.df <- inverse.predict.by.treatment(
         data = individual.rows,
@@ -507,7 +486,7 @@ gglogistic <- function(
         predictor = {{predictor}},
         probability = probability.of.interest,
         alpha = 1,
-        digits = 3
+        digits = inverse.predict.digits
       )
     }
 
@@ -525,7 +504,7 @@ gglogistic <- function(
         predictor = {{predictor}},
         probability = probability.of.interest,
         alpha = effective.replicate.alpha(inverse.treatment),
-        digits = 3
+        digits = inverse.predict.digits
       )
     }
   }

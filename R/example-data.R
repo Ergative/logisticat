@@ -77,6 +77,7 @@ metamorphosis <- function() {
 
 #' Small data set for use testing functions in this package.
 #'
+#' @keywords internal
 #' @return A `data.frame` with example data.
 sanity.check <- function() {
   tibble::tribble(

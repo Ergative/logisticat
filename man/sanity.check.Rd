@@ -12,3 +12,4 @@ A \code{data.frame} with example data.
 \description{
 Small data set for use testing functions in this package.
 }
+\keyword{internal}

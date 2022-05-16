@@ -17,3 +17,4 @@ A hex string representing the color with the chosen alpha.
 \description{
 Set the alpha value of a color.
 }
+\keyword{internal}

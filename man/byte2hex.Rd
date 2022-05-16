@@ -15,3 +15,4 @@ String representation of byte.
 \description{
 Get a two-character hex string representation of a number.
 }
+\keyword{internal}

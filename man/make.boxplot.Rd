@@ -25,3 +25,4 @@ A geom of a boxplot.
 \description{
 Create a geom for a box plot of success fractions.
 }
+\keyword{internal}

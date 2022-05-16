@@ -15,3 +15,4 @@ A list, with one vector for each row.
 \description{
 Get a list a row vectors from a data frame.
 }
+\keyword{internal}

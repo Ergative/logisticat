@@ -15,3 +15,4 @@ String representation of nybble.
 \description{
 Get a hex string representation of a nybble
 }
+\keyword{internal}

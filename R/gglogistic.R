@@ -49,6 +49,16 @@
 #'
 #' @return A ggplot object.
 #' @export
+#' @examples
+#' metamorphosis.data <- logisticat::metamorphosis()
+#' head(metamorphosis.data) # Has columns for success and failure counts
+#' logisticat::gglogistic(metamorphosis.data,
+#'                        predictor=days,
+#'                        success.counts=metamorphosed,
+#'                        failure.counts=did.not.metamorphose,
+#'                        treatment=ration,
+#'                        replicate=beaker,
+#'                        probability.of.interest=0.5)
 gglogistic <- function(
   # Data Frame and Columns, plus what to draw for them.
   data,

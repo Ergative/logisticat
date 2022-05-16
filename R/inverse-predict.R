@@ -20,6 +20,8 @@ inverse.predict <- function(regression, probability){
 #' @param treatment Data variable representing treatments.
 #' @param probability Probability for which to make inverse predictions.
 #'
+#' @keywords internal
+#'
 #' @return A tibble with columns for replicate, treatment, and predictor
 inverse.predict.by.treatment = function(data, predictor, outcome,
                                         treatment, probability)
@@ -71,6 +73,8 @@ inverse.predict.by.treatment = function(data, predictor, outcome,
 #' @param treatment Data variable representing treatments.
 #' @param replicate Data variable representing replicates within treatments.
 #' @param probability Probability for which to make inverse predictions.
+#'
+#' @keywords internal
 #'
 #' @return A tibble with columns for replicate, treatment, and predictor
 inverse.predict.by.replicate = function(data, predictor, outcome,

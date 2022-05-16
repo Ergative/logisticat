@@ -102,3 +102,14 @@ A ggplot object.
 \description{
 Plot logistic regression of probability from 0\% to 100\% across a predictor.
 }
+\examples{
+metamorphosis.data <- logisticat::metamorphosis()
+head(metamorphosis.data) # Has columns for success and failure counts
+logisticat::gglogistic(metamorphosis.data,
+                       predictor=days,
+                       success.counts=metamorphosed,
+                       failure.counts=did.not.metamorphose,
+                       treatment=ration,
+                       replicate=beaker,
+                       probability.of.interest=0.5)
+}

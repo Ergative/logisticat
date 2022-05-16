@@ -23,3 +23,4 @@ A tibble with columns for replicate, treatment, and predictor
 \description{
 Create a Data frame with an inverse prediction for each treatment
 }
+\keyword{internal}

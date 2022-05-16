@@ -32,3 +32,4 @@ A list of geoms.
 \description{
 Draw "T"-shaped intersection of predicted with probability.
 }
+\keyword{internal}

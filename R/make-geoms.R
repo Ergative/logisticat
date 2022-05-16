@@ -8,6 +8,8 @@
 #' @param alpha Alpha value for line.
 #' @param ... Additional arguments to pass to the underlying geom.
 #'
+#' @keywords internal
+#'
 #' @return geom that can be added to a ggplot to show regressions.
 make.regression.line <- function(individual.rows, group, color, alpha=1, ...) {
   ggplot2::geom_line(
@@ -34,6 +36,8 @@ make.regression.line <- function(individual.rows, group, color, alpha=1, ...) {
 #' @param group Data variable for groups and color.
 #' @param fill.alpha Opacity of fill color for boxplot in range \[0,1\].
 #' @param ... Additional arguments for underlying geom.
+#'
+#' @keywords internal
 #'
 #' @return A geom of a boxplot.
 make.boxplot <- function(fraction.data, x, y, group, fill.alpha = 0.25, ...) {
@@ -75,6 +79,8 @@ make.boxplot <- function(fraction.data, x, y, group, fill.alpha = 0.25, ...) {
 #' @param alpha Opacity in range \[0,1\].
 #' @param digits Digits of inverse predicted values to show.
 #' @param ... Additional arguments to geoms.
+#'
+#' @keywords internal
 #'
 #' @return A list of geoms.
 make.inverse.prediction.geoms <- function(

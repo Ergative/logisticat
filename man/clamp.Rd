@@ -19,3 +19,4 @@ The closest number in the range [min.value,max.value] to value.
 \description{
 Constrain a numeric value within a range.
 }
+\keyword{internal}

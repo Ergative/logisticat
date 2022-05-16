@@ -26,3 +26,4 @@ Create a geom representing a logistic regression on the data.
 \note{
 x and y must be specified as aesthetics on the ggplot to which this is added.
 }
+\keyword{internal}

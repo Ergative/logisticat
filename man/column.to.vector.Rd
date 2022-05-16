@@ -17,3 +17,4 @@ Vector of column contents.
 \description{
 Get a vector from a data frame column.
 }
+\keyword{internal}

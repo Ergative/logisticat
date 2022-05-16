@@ -3,6 +3,8 @@
 #' @param color Color specified as a name or hex string.
 #' @param alpha Value in range \[0,1\] for alpha.
 #'
+#' @keywords internal
+#'
 #' @return A hex string representing the color with the chosen alpha.
 with.alpha <- Vectorize(function(color, alpha=1) {
   a <- clamp(floor(alpha * 255), 0, 255)
@@ -17,6 +19,8 @@ with.alpha <- Vectorize(function(color, alpha=1) {
 #' @param min.value Minimum, inclusive.
 #' @param max.value Maximum, inclusive.
 #'
+#' @keywords internal
+#'
 #' @return The closest number in the range \[min.value,max.value\] to value.
 clamp <- function(value, min.value, max.value) {
   max(min.value, min(max.value, value))
@@ -27,6 +31,8 @@ clamp <- function(value, min.value, max.value) {
 #'
 #' @param byte Integer value in range \[0,255\]
 #'
+#' @keywords internal
+#'
 #' @return String representation of byte.
 byte2hex <- function(byte) {
   paste0(nybble2hex(bitwShiftR(byte, 4)), nybble2hex(bitwAnd(byte, 15)))
@@ -36,6 +42,8 @@ byte2hex <- function(byte) {
 #' Get a hex string representation of a nybble
 #'
 #' @param nybble Integer value in range \[0,15\]
+#'
+#' @keywords internal
 #'
 #' @return String representation of nybble.
 nybble2hex <- function(nybble) {
@@ -51,6 +59,8 @@ nybble2hex <- function(nybble) {
 #' @param data Data frame.
 #' @param column Column to extract - can be used with \{\{\}\}.
 #'
+#' @keywords internal
+#'
 #' @return Vector of column contents.
 column.to.vector <- function(data, column) {
   column.name <- as_name(rlang::ensym(column))
@@ -61,6 +71,8 @@ column.to.vector <- function(data, column) {
 #' Get a list a row vectors from a data frame.
 #'
 #' @param data Data frame.
+#'
+#' @keywords internal
 #'
 #' @return A list, with one vector for each row.
 list.df.rows <- function(data){

@@ -1065,9 +1065,14 @@ list.df.rows <- function(data){
 
 
 #' C#-style null-coalescing operator.
+#' @name nullcoalesce
 #' @keywords internal
 #' @return Second argument if first argument is NULL, else first argument.
 `%??%` <- function(maybe.null, replacement){
+  # Extremely weird behavior of devtools::document():
+  # If I don't specify a @name for this function, it creates a file
+  # "grapes-help-help-grapes.Rd" which I finally figured out is it's attempt
+  # to create a human readable name from the string %??%.
   if (is.null(maybe.null)) return(replacement)
   return(maybe.null)
 }

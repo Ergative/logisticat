@@ -18,6 +18,12 @@ You can install the development version of logisticat from
 devtools::install_github("Ergative/logisticat")
 ```
 
+You can uninstall it with:
+
+``` r
+remove.packages("logisticat")
+```
+
 ## Example
 
 Say you wanted to know whether feeding sea urchin larvae higher rations
